@@ -44,8 +44,21 @@ src/
 
 Font: Poppins (`@expo-google-fonts/poppins`, bundled with the app).
 
+## Assets
+
+| File                            | Used for                                          |
+| ------------------------------- | ------------------------------------------------- |
+| `assets/icon.png`               | iOS app icon (opaque, 1024×1024)                  |
+| `assets/adaptive-icon.png`      | Android adaptive icon foreground (white background) |
+| `assets/splash-icon.png`        | Splash screen (white background)                  |
+| `assets/favicon.png`            | Web favicon                                       |
+| `assets/rayno-wordmark.png`     | Logo on the Home screen                           |
+| `assets/listings/*.jpg`         | Mock listing photos (300×240, ~10 KB each)        |
+
+Expo Go always shows its own icon and splash. Yours appear in development and store builds (`npx eas-cli@latest build`).
+
 ## Built for slow connections
 
 - No animation libraries; sheets use the core `Modal` with a fade.
-- The logo and listing tiles are drawn from views and icons, so the home screen needs no image downloads.
-- Listings accept an optional small `image` URL (~240px); when set it is shown via `expo-image` with disk caching.
+- Mock listing photos are bundled with the app (~75 KB in total), so Home needs no downloads.
+- A listing's `image` can also be a remote URL; keep it around 300px. `expo-image` caches it on disk.

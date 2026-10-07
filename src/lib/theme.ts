@@ -33,3 +33,10 @@ export const spacing = {
   lg: 16,
   xl: 24,
 } as const;
+
+/** Cross-platform shadows (boxShadow works on iOS, Android and web with the New Architecture). */
+export const shadows = {
+  soft: { boxShadow: '0px 2px 8px rgba(11, 31, 59, 0.08)' },
+  card: { boxShadow: '0px 4px 10px rgba(11, 31, 59, 0.12)' },
+  raised: { boxShadow: '0px 6px 14px rgba(0, 102, 255, 0.35)' },
+} as const;

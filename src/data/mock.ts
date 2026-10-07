@@ -16,17 +16,23 @@ export type Listing = {
   priceSuffix?: string;
   location: string;
   category: 'electronics' | 'fashion' | 'home' | 'vehicles' | 'services' | 'property';
-  /** Optional remote image. Keep it small (~240px). Cards show an icon tile when absent. */
-  image?: string;
+  /**
+   * Small photo (~300px, compressed): a bundled `require(...)` or a remote URL.
+   * Cards fall back to an icon tile when absent.
+   */
+  image?: number | string;
   icon: IconName;
   tint: string;
+  /** Whether the current user has saved this listing. */
+  saved?: boolean;
 };
 
 export type ActionCard = {
   key: 'need-it-now' | 'market' | 'services' | 'stores' | 'deals';
   title: string;
   subtitle: string;
-  icon: IconName;
+  /** 'percent-disc' draws the white % badge used on the Deals card. */
+  icon: IconName | 'percent-disc';
   color: string;
   href: '/need-it-now' | '/market' | '/services' | '/stores' | '/deals';
 };
@@ -73,7 +79,7 @@ export const actionCards: ActionCard[] = [
     key: 'services',
     title: 'Services',
     subtitle: 'Find Professionals',
-    icon: 'construct-outline',
+    icon: 'construct',
     color: '#FF8A00',
     href: '/services',
   },
@@ -81,7 +87,7 @@ export const actionCards: ActionCard[] = [
     key: 'stores',
     title: 'Stores',
     subtitle: 'Verified Businesses',
-    icon: 'storefront-outline',
+    icon: 'storefront',
     color: '#7B3FE4',
     href: '/stores',
   },
@@ -89,7 +95,7 @@ export const actionCards: ActionCard[] = [
     key: 'deals',
     title: 'Deals',
     subtitle: "Today's Offers",
-    icon: 'pricetag-outline',
+    icon: 'percent-disc',
     color: '#F0393C',
     href: '/deals',
   },
@@ -104,6 +110,7 @@ export const nearYou: Listing[] = [
     category: 'electronics',
     icon: 'phone-portrait-outline',
     tint: '#E6F0FF',
+    image: require('../../assets/listings/iphone.jpg'),
   },
   {
     id: 'n2',
@@ -113,6 +120,8 @@ export const nearYou: Listing[] = [
     category: 'home',
     icon: 'bed-outline',
     tint: '#FFF1E0',
+    image: require('../../assets/listings/sofa.jpg'),
+    saved: true,
   },
   {
     id: 'n3',
@@ -123,6 +132,8 @@ export const nearYou: Listing[] = [
     category: 'services',
     icon: 'flash-outline',
     tint: '#FFF6D6',
+    image: require('../../assets/listings/electrician.jpg'),
+    saved: true,
   },
   {
     id: 'n4',
@@ -132,6 +143,7 @@ export const nearYou: Listing[] = [
     category: 'electronics',
     icon: 'tv-outline',
     tint: '#E6F0FF',
+    image: require('../../assets/listings/tv.jpg'),
   },
 ];
 
@@ -144,6 +156,8 @@ export const trendingToday: Listing[] = [
     category: 'vehicles',
     icon: 'car-sport-outline',
     tint: '#FDE7E7',
+    image: require('../../assets/listings/car.jpg'),
+    saved: true,
   },
   {
     id: 't2',
@@ -154,6 +168,8 @@ export const trendingToday: Listing[] = [
     category: 'fashion',
     icon: 'shirt-outline',
     tint: '#FCE8F1',
+    image: require('../../assets/listings/dress.jpg'),
+    saved: true,
   },
   {
     id: 't3',
@@ -163,6 +179,7 @@ export const trendingToday: Listing[] = [
     category: 'property',
     icon: 'home-outline',
     tint: '#E3F8EC',
+    image: require('../../assets/listings/house.jpg'),
   },
   {
     id: 't4',
@@ -173,6 +190,7 @@ export const trendingToday: Listing[] = [
     category: 'electronics',
     icon: 'laptop-outline',
     tint: '#ECEFF3',
+    image: require('../../assets/listings/laptop.jpg'),
   },
 ];
 

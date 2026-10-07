@@ -5,56 +5,74 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from './AppText';
 import type { Listing } from '@/data/mock';
 import { formatNLe } from '@/lib/format';
-import { colors, radius } from '@/lib/theme';
+import { colors, shadows } from '@/lib/theme';
 
-const CARD_WIDTH = 132;
+export type ListingCardVariant = 'featured' | 'compact';
 
-export function ListingCard({ item }: { item: Listing }) {
-  const [saved, setSaved] = useState(false);
+const SIZES = {
+  featured: { width: 124, imageHeight: 98 },
+  compact: { width: 96, imageHeight: 84 },
+} as const;
+
+type Props = {
+  item: Listing;
+  variant?: ListingCardVariant;
+};
+
+export function ListingCard({ item, variant = 'featured' }: Props) {
+  const [saved, setSaved] = useState(item.saved ?? false);
+  const { width, imageHeight } = SIZES[variant];
+  const featured = variant === 'featured';
+  const price = formatNLe(item.price, item.priceSuffix);
 
   return (
     <Pressable
-      style={styles.card}
+      style={[styles.card, featured && styles.featuredCard, { width }]}
       accessibilityRole="button"
-      accessibilityLabel={`${item.title}, ${formatNLe(item.price, item.priceSuffix)}, ${item.location}`}
+      accessibilityLabel={`${item.title}, ${price}, ${item.location}`}
     >
-      <View style={[styles.media, { backgroundColor: item.tint }]}>
+      <View style={[styles.media, { height: imageHeight, backgroundColor: item.tint }]}>
         {item.image ? (
           <Image
             source={item.image}
-            style={StyleSheet.absoluteFill}
+            style={styles.image}
             contentFit="cover"
             cachePolicy="memory-disk"
             transition={0}
+            recyclingKey={item.id}
           />
         ) : (
-          <Ionicons name={item.icon} size={44} color={colors.navy} style={styles.icon} />
+          <Ionicons name={item.icon} size={40} color={colors.navy} />
         )}
         <Pressable
           onPress={() => setSaved((s) => !s)}
-          hitSlop={8}
+          hitSlop={10}
           style={styles.heart}
           accessibilityRole="button"
-          accessibilityLabel={saved ? 'Remove from saved' : 'Save'}
+          accessibilityLabel={saved ? `Remove ${item.title} from saved` : `Save ${item.title}`}
         >
           <Ionicons
             name={saved ? 'heart' : 'heart-outline'}
-            size={16}
-            color={saved ? colors.red : colors.textMuted}
+            size={14}
+            color={saved ? colors.red : colors.primary}
           />
         </Pressable>
       </View>
-      <AppText weight="medium" size={13} numberOfLines={1} style={styles.title}>
-        {item.title}
-      </AppText>
-      <AppText weight="semiBold" size={14}>
-        {formatNLe(item.price, item.priceSuffix)}
-      </AppText>
-      <View style={styles.locationRow}>
-        <Ionicons name="location-outline" size={12} color={colors.textMuted} />
-        <AppText size={11} color={colors.textMuted}>
-          {item.location}
+      <View style={featured ? styles.featuredBody : styles.compactBody}>
+        <AppText weight="medium" size={featured ? 13 : 11} numberOfLines={1}>
+          {item.title}
         </AppText>
+        <AppText weight="semiBold" size={featured ? 14 : 13} style={styles.price}>
+          {price}
+        </AppText>
+        {featured ? (
+          <View style={styles.locationRow}>
+            <Ionicons name="location-sharp" size={12} color={colors.textMuted} />
+            <AppText size={12} color={colors.textMuted}>
+              {item.location}
+            </AppText>
+          </View>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -62,37 +80,48 @@ export function ListingCard({ item }: { item: Listing }) {
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
+    borderRadius: 12,
+  },
+  featuredCard: {
+    backgroundColor: colors.white,
+    ...shadows.soft,
   },
   media: {
-    width: CARD_WIDTH,
-    height: CARD_WIDTH * 0.85,
-    borderRadius: radius.md,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  icon: {
-    opacity: 0.8,
+  image: {
+    width: '100%',
+    height: '100%',
   },
   heart: {
     position: 'absolute',
     top: 6,
     right: 6,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    marginTop: 8,
+  featuredBody: {
+    paddingHorizontal: 4,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  compactBody: {
+    paddingTop: 8,
+  },
+  price: {
+    marginTop: 1,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
-    marginTop: 2,
+    gap: 3,
+    marginTop: 3,
   },
 });
