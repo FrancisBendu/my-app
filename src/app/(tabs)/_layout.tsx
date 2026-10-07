@@ -23,9 +23,11 @@ function TabLabel({ focused, color, label }: TabRenderProps & { label: string })
   return (
     <AppText
       weight={focused ? 'semiBold' : 'regular'}
-      size={12.5}
+      size={12}
       color={String(color)}
       numberOfLines={1}
+      adjustsFontSizeToFit
+      minimumFontScale={0.8}
       style={styles.label}
     >
       {label}
@@ -115,6 +117,8 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   label: {
     marginTop: 2,
+    alignSelf: 'stretch',
+    textAlign: 'center',
   },
   createSlot: {
     flex: 1,

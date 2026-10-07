@@ -2,7 +2,7 @@
 
 Your everyday app for Sierra Leone. Buy. Find. Connect.
 
-Built with Expo (React Native), TypeScript and Expo Router. This is the UI foundation: all data is mocked, there is no backend yet.
+Built with Expo (React Native), TypeScript and Expo Router. This is a working demo: every screen works, but data is sample data or saved on the phone only. There is no backend yet. See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan to launch.
 
 ## Run it
 
@@ -20,15 +20,17 @@ Typecheck with `npm run typecheck`.
 ```
 src/
   app/                 Expo Router routes (every file is a screen)
-    _layout.tsx        Root stack, loads Poppins
+    _layout.tsx        Root stack, loads Poppins, provides the app store
     (tabs)/            Bottom tabs: Home, Search, + (create sheet), Messages, Profile
-    need-it-now.tsx    Placeholder screens opened from the Home action cards
-    market.tsx
-    services.tsx
-    stores.tsx
-    deals.tsx
-  components/          Shared UI (cards, sheets, logo, text)
-  data/mock.ts         ALL mock data — replace with API calls later
+    listing/[id].tsx   Item page (photos, seller, chat, save, share)
+    member/[id].tsx    Seller / store / service provider page
+    chat/[id].tsx      Chat thread
+    market, services, stores, deals, need-it-now
+    sell, offer-service, scan, saved, my-listings, edit-profile, notifications, help
+  components/          Shared UI (cards, sheets, forms, rows)
+  data/mock.ts         Sample sellers, items, chats — replace with API calls later
+  data/locations.ts    All 16 districts of Sierra Leone with towns
+  lib/store.tsx        What the user creates (saved on the phone with AsyncStorage)
   lib/theme.ts         Brand colours, fonts, spacing
   lib/format.ts        formatNLe(24500) -> "NLe 24,500"
 ```

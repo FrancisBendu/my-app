@@ -22,7 +22,7 @@ const OPTIONS: Option[] = [
     subtitle: 'List an item on the Market',
     icon: 'bag-add-outline',
     color: colors.green,
-    href: '/market',
+    href: '/sell',
   },
   {
     key: 'service',
@@ -30,7 +30,7 @@ const OPTIONS: Option[] = [
     subtitle: 'Get hired by people near you',
     icon: 'construct-outline',
     color: colors.orange,
-    href: '/services',
+    href: '/offer-service',
   },
   {
     key: 'need',

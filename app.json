@@ -31,7 +31,23 @@
           "backgroundColor": "#FFFFFF"
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "RAYNO uses the camera to scan QR codes and take photos of items you sell.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "RAYNO needs your photos so you can add pictures to your listings.",
+          "cameraPermission": "RAYNO uses the camera to take photos of items you sell.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "scheme": "rayno"
   }

@@ -1,20 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionCard } from '@/components/ActionCard';
 import { AppText } from '@/components/AppText';
 import { ListingSection } from '@/components/ListingSection';
 import { LocationSheet } from '@/components/LocationSheet';
-import {
-  actionCards,
-  DEFAULT_LOCATION,
-  nearYou,
-  notificationCount,
-  trendingToday,
-} from '@/data/mock';
+import { ALL_SIERRA_LEONE, isNearby } from '@/data/locations';
+import { actionCards } from '@/data/mock';
+import { useStore } from '@/lib/store';
 import { colors, radius, shadows, spacing } from '@/lib/theme';
 
 const wordmark = require('../../../assets/rayno-wordmark.png');
@@ -22,8 +18,14 @@ const wordmark = require('../../../assets/rayno-wordmark.png');
 const WORDMARK_ASPECT = 865 / 190;
 
 export default function HomeScreen() {
-  const [location, setLocation] = useState(DEFAULT_LOCATION);
+  const { location, setLocation, allListings } = useStore();
   const [locationOpen, setLocationOpen] = useState(false);
+
+  const nearYou = useMemo(
+    () => allListings.filter((l) => isNearby(l.location, location)).slice(0, 10),
+    [allListings, location],
+  );
+  const trending = useMemo(() => allListings.filter((l) => l.trending), [allListings]);
 
   const [primary, secondary] = [actionCards.slice(0, 2), actionCards.slice(2)];
   const goToSearch = () => router.push('/search');
@@ -40,12 +42,13 @@ export default function HomeScreen() {
             accessibilityRole="header"
           />
           <Pressable
+            onPress={() => router.push('/notifications')}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel={`Notifications, ${notificationCount} new`}
+            accessibilityLabel="Notifications"
           >
             <Ionicons name="notifications-outline" size={28} color={colors.navy} />
-            {notificationCount > 0 ? <View style={styles.dot} /> : null}
+            <View style={styles.dot} />
           </Pressable>
         </View>
         <AppText weight="medium" size={14} style={styles.tagline}>
@@ -62,7 +65,14 @@ export default function HomeScreen() {
           <AppText size={16} color={colors.textMuted} style={styles.searchText}>
             What do you need today?
           </AppText>
-          <Ionicons name="scan-outline" size={22} color={colors.navy} />
+          <Pressable
+            onPress={() => router.push('/scan')}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Scan a QR code or barcode"
+          >
+            <Ionicons name="scan-outline" size={22} color={colors.navy} />
+          </Pressable>
         </Pressable>
 
         <Pressable
@@ -91,10 +101,28 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <ListingSection title="Near You" items={nearYou} onSeeAll={() => router.push('/market')} />
+        {nearYou.length > 0 ? (
+          <ListingSection
+            title={location === ALL_SIERRA_LEONE ? 'Latest' : 'Near You'}
+            items={nearYou}
+            onSeeAll={() => router.push('/market')}
+          />
+        ) : (
+          <View style={styles.emptyNear}>
+            <AppText weight="semiBold" size={20}>
+              Near You
+            </AppText>
+            <View style={styles.emptyCard}>
+              <AppText size={14}>Nothing listed around {location} yet.</AppText>
+              <AppText size={13} color={colors.textMuted}>
+                Be the first: tap the blue + button to sell something, or choose another location.
+              </AppText>
+            </View>
+          </View>
+        )}
         <ListingSection
           title="Trending Today"
-          items={trendingToday}
+          items={trending}
           variant="compact"
           onSeeAll={() => router.push('/market')}
         />
@@ -105,6 +133,7 @@ export default function HomeScreen() {
         selected={location}
         onSelect={setLocation}
         onClose={() => setLocationOpen(false)}
+        allowAll
       />
     </SafeAreaView>
   );
@@ -178,5 +207,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: spacing.md,
+  },
+  emptyNear: {
+    marginTop: 20,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.md,
+  },
+  emptyCard: {
+    padding: spacing.lg,
+    borderRadius: radius.md,
+    backgroundColor: colors.lightGrey,
+    gap: 4,
   },
 });

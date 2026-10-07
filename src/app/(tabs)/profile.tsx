@@ -1,70 +1,110 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { router, type Href } from 'expo-router';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
-import { currentUser, type IconName } from '@/data/mock';
+import { Avatar, Button, DemoNote } from '@/components/ui';
+import type { IconName } from '@/data/mock';
+import { useStore } from '@/lib/store';
 import { colors, radius, spacing } from '@/lib/theme';
 
-const MENU: { label: string; icon: IconName }[] = [
-  { label: 'My Products', icon: 'cube-outline' },
-  { label: 'Orders', icon: 'receipt-outline' },
-  { label: 'Store Settings', icon: 'settings-outline' },
-  { label: 'Verification', icon: 'shield-checkmark-outline' },
-  { label: 'Help & Support', icon: 'help-circle-outline' },
-];
-
 export default function ProfileScreen() {
+  const { profile, myListings, myServices, savedIds, conversations, requests, resetDemo } = useStore();
+  const hasProfile = Boolean(profile.name.trim());
+
   const stats = [
-    { label: 'Products', value: String(currentUser.products) },
-    { label: 'Views', value: currentUser.views },
-    { label: 'Sales', value: String(currentUser.sales) },
+    { label: 'Listings', value: myListings.length, href: '/my-listings' as Href },
+    { label: 'Saved', value: savedIds.length, href: '/saved' as Href },
+    { label: 'Chats', value: conversations.length, href: '/messages' as Href },
   ];
+
+  const menu: { label: string; icon: IconName; href: Href; detail?: string }[] = [
+    { label: 'My Listings', icon: 'cube-outline', href: '/my-listings', detail: String(myListings.length) },
+    { label: 'Saved Items', icon: 'heart-outline', href: '/saved', detail: String(savedIds.length) },
+    { label: 'My Requests', icon: 'flash-outline', href: '/need-it-now', detail: String(requests.length) },
+    ...myServices.map((s) => ({
+      label: `My service: ${s.trade}`,
+      icon: 'construct-outline' as IconName,
+      href: `/member/${s.id}` as Href,
+    })),
+    { label: 'Sell a Product', icon: 'bag-add-outline', href: '/sell' },
+    { label: 'Offer a Service', icon: 'hammer-outline', href: '/offer-service' },
+    { label: 'Notifications', icon: 'notifications-outline', href: '/notifications' },
+    { label: 'Help & About', icon: 'help-circle-outline', href: '/help' },
+  ];
+
+  const reset = () =>
+    Alert.alert('Reset demo data?', 'This deletes your listings, chats, saved items and profile on this phone.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Reset', style: 'destructive', onPress: resetDemo },
+    ]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={32} color={colors.white} />
-          </View>
-          <View>
-            <View style={styles.nameRow}>
-              <AppText weight="semiBold" size={18}>
-                {currentUser.name}
-              </AppText>
-              <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
-            </View>
-            <AppText size={13} color={colors.textMuted}>
-              {currentUser.role}
+          <Avatar name={hasProfile ? profile.name : '?'} size={68} />
+          <View style={styles.flex}>
+            <AppText weight="semiBold" size={19}>
+              {hasProfile ? profile.name : 'Welcome to RAYNO'}
             </AppText>
-            <AppText size={13}>
-              ⭐ {currentUser.rating} ({currentUser.reviews} reviews)
+            <AppText size={13} color={colors.textMuted}>
+              {hasProfile ? [profile.phone, profile.location].filter(Boolean).join(' · ') : 'Add your name so sellers know who they’re talking to.'}
             </AppText>
           </View>
         </View>
+        <Button
+          label={hasProfile ? 'Edit profile' : 'Set up your profile'}
+          icon="create-outline"
+          variant="secondary"
+          onPress={() => router.push('/edit-profile')}
+          style={styles.editButton}
+        />
 
         <View style={styles.stats}>
           {stats.map((stat) => (
-            <View key={stat.label} style={styles.stat}>
+            <Pressable key={stat.label} onPress={() => router.push(stat.href)} style={styles.stat} accessibilityRole="button">
               <AppText weight="semiBold" size={18}>
                 {stat.value}
               </AppText>
               <AppText size={12} color={colors.textMuted}>
                 {stat.label}
               </AppText>
-            </View>
+            </Pressable>
           ))}
         </View>
 
-        {MENU.map((item) => (
-          <Pressable key={item.label} style={styles.menuRow} accessibilityRole="button">
+        {menu.map((item) => (
+          <Pressable
+            key={item.label}
+            onPress={() => router.push(item.href)}
+            style={({ pressed }) => [styles.menuRow, pressed && styles.pressed]}
+            accessibilityRole="button"
+          >
             <Ionicons name={item.icon} size={20} color={colors.navy} />
-            <AppText size={15} style={styles.menuLabel}>
+            <AppText size={15} style={styles.flex}>
               {item.label}
             </AppText>
+            {item.detail ? (
+              <AppText size={13} color={colors.textMuted}>
+                {item.detail}
+              </AppText>
+            ) : null}
             <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
         ))}
+
+        <View style={styles.note}>
+          <DemoNote>
+            Demo version: your profile, listings, chats and saved items are stored on this phone only.
+            Sign-in with your phone number, real sellers and payments come with the RAYNO server.
+          </DemoNote>
+        </View>
+        <Pressable onPress={reset} style={styles.reset} accessibilityRole="button">
+          <AppText size={13} color={colors.red}>
+            Reset demo data
+          </AppText>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -77,28 +117,23 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
+    paddingBottom: spacing.xl * 2,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.lg,
   },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.navy,
-    alignItems: 'center',
-    justifyContent: 'center',
+  flex: {
+    flex: 1,
   },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  editButton: {
+    marginTop: spacing.lg,
+    height: 44,
   },
   stats: {
     flexDirection: 'row',
-    marginVertical: spacing.xl,
+    marginVertical: spacing.lg,
     paddingVertical: spacing.lg,
     borderRadius: radius.lg,
     backgroundColor: colors.lightGrey,
@@ -115,7 +150,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
-  menuLabel: {
-    flex: 1,
+  pressed: {
+    opacity: 0.6,
+  },
+  note: {
+    marginTop: spacing.xl,
+  },
+  reset: {
+    alignSelf: 'center',
+    padding: spacing.md,
+    marginTop: spacing.sm,
   },
 });

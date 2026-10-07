@@ -10,6 +10,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StoreProvider } from '@/lib/store';
 import { colors, fonts } from '@/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -30,6 +31,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
+      <StoreProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -47,7 +49,19 @@ export default function RootLayout() {
         <Stack.Screen name="services" options={{ title: 'Services' }} />
         <Stack.Screen name="stores" options={{ title: 'Stores' }} />
         <Stack.Screen name="deals" options={{ title: 'Deals' }} />
+        <Stack.Screen name="listing/[id]" options={{ title: '' }} />
+        <Stack.Screen name="member/[id]" options={{ title: '' }} />
+        <Stack.Screen name="chat/[id]" options={{ title: '' }} />
+        <Stack.Screen name="scan" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
+        <Stack.Screen name="sell" options={{ title: 'Sell a Product' }} />
+        <Stack.Screen name="offer-service" options={{ title: 'Offer a Service' }} />
+        <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
+        <Stack.Screen name="saved" options={{ title: 'Saved Items' }} />
+        <Stack.Screen name="my-listings" options={{ title: 'My Listings' }} />
+        <Stack.Screen name="edit-profile" options={{ title: 'Edit Profile' }} />
+        <Stack.Screen name="help" options={{ title: 'Help & About' }} />
       </Stack>
+      </StoreProvider>
     </SafeAreaProvider>
   );
 }
