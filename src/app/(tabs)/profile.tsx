@@ -9,16 +9,19 @@ import { useStore } from '@/lib/store';
 import { colors, radius, spacing } from '@/lib/theme';
 
 export default function ProfileScreen() {
-  const { profile, myListings, myServices, savedIds, conversations, requests, resetDemo } = useStore();
+  const { profile, myListings, myServices, savedIds, conversations, requests, orders, cart, resetDemo } = useStore();
   const hasProfile = Boolean(profile.name.trim());
 
   const stats = [
+    { label: 'Orders', value: orders.length, href: '/orders' as Href },
     { label: 'Listings', value: myListings.length, href: '/my-listings' as Href },
     { label: 'Saved', value: savedIds.length, href: '/saved' as Href },
     { label: 'Chats', value: conversations.length, href: '/messages' as Href },
   ];
 
   const menu: { label: string; icon: IconName; href: Href; detail?: string }[] = [
+    { label: 'My Orders', icon: 'receipt-outline', href: '/orders', detail: String(orders.length) },
+    { label: 'Cart', icon: 'cart-outline', href: '/cart', detail: String(cart.reduce((n, c) => n + c.qty, 0)) },
     { label: 'My Listings', icon: 'cube-outline', href: '/my-listings', detail: String(myListings.length) },
     { label: 'Saved Items', icon: 'heart-outline', href: '/saved', detail: String(savedIds.length) },
     { label: 'My Requests', icon: 'flash-outline', href: '/need-it-now', detail: String(requests.length) },
@@ -30,6 +33,7 @@ export default function ProfileScreen() {
     { label: 'Sell a Product', icon: 'bag-add-outline', href: '/sell' },
     { label: 'Offer a Service', icon: 'hammer-outline', href: '/offer-service' },
     { label: 'Notifications', icon: 'notifications-outline', href: '/notifications' },
+    { label: 'Settings', icon: 'settings-outline', href: '/settings' },
     { label: 'Help & About', icon: 'help-circle-outline', href: '/help' },
   ];
 
@@ -42,6 +46,9 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
+        <Pressable onPress={() => router.push('/settings')} style={styles.gear} hitSlop={10} accessibilityLabel="Settings">
+          <Ionicons name="settings-outline" size={24} color={colors.navy} />
+        </Pressable>
         <View style={styles.header}>
           <Avatar name={hasProfile ? profile.name : '?'} size={68} />
           <View style={styles.flex}>
@@ -118,6 +125,10 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xl * 2,
+  },
+  gear: {
+    alignSelf: 'flex-end',
+    marginBottom: spacing.xs,
   },
   header: {
     flexDirection: 'row',

@@ -60,6 +60,12 @@ export default function RootLayout() {
         <Stack.Screen name="my-listings" options={{ title: 'My Listings' }} />
         <Stack.Screen name="edit-profile" options={{ title: 'Edit Profile' }} />
         <Stack.Screen name="help" options={{ title: 'Help & About' }} />
+        <Stack.Screen name="cart" options={{ title: 'Cart' }} />
+        <Stack.Screen name="checkout" options={{ title: 'Checkout' }} />
+        <Stack.Screen name="order/[id]" options={{ title: 'Order' }} />
+        <Stack.Screen name="orders" options={{ title: 'My Orders' }} />
+        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+        <Stack.Screen name="legal" options={{ title: 'Privacy & Terms' }} />
       </Stack>
       </StoreProvider>
     </SafeAreaProvider>

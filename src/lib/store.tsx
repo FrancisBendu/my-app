@@ -36,6 +36,29 @@ export type NeedRequest = {
   createdAt: string;
 };
 
+export type CartItem = { listingId: string; qty: number };
+
+export type PaymentMethod = 'orange' | 'afrimoney' | 'card' | 'cash';
+
+export type OrderStatus = 'Paid · protected' | 'Pay on delivery' | 'Received' | 'Problem reported';
+
+export type Order = {
+  id: string;
+  items: { listingId: string; title: string; price: number; qty: number; sellerId: string }[];
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  method: PaymentMethod;
+  /** Card orders keep only the brand and last 4 digits — never the full number. */
+  cardLabel?: string;
+  payerPhone?: string;
+  fulfilment: 'delivery' | 'pickup';
+  address: string;
+  phone: string;
+  status: OrderStatus;
+  createdAt: string;
+};
+
 export type Profile = {
   name: string;
   phone: string;
@@ -50,6 +73,9 @@ type State = {
   conversations: Conversation[];
   requests: NeedRequest[];
   profile: Profile;
+  cart: CartItem[];
+  orders: Order[];
+  viewedIds: string[];
 };
 
 const STORAGE_KEY = 'rayno-state-v1';
@@ -63,6 +89,9 @@ const initialState: State = {
   conversations: seedConversations,
   requests: [],
   profile: { name: '', phone: '', location: DEFAULT_LOCATION },
+  cart: [],
+  orders: [],
+  viewedIds: [],
 };
 
 const newId = (prefix: string) => `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -207,6 +236,63 @@ function useAppState() {
 
   const resetDemo = useCallback(() => setState(initialState), []);
 
+  /** Remembers what the user opened, newest first, for "Recently viewed". */
+  const addViewed = useCallback(
+    (id: string) =>
+      setState((s) =>
+        s.viewedIds[0] === id ? s : { ...s, viewedIds: [id, ...s.viewedIds.filter((x) => x !== id)].slice(0, 12) },
+      ),
+    [],
+  );
+
+  const addToCart = useCallback(
+    (listingId: string, qty = 1) =>
+      setState((s) => {
+        const existing = s.cart.find((c) => c.listingId === listingId);
+        const cart = existing
+          ? s.cart.map((c) => (c.listingId === listingId ? { ...c, qty: c.qty + qty } : c))
+          : [...s.cart, { listingId, qty }];
+        return { ...s, cart };
+      }),
+    [],
+  );
+
+  const setCartQty = useCallback(
+    (listingId: string, qty: number) =>
+      setState((s) => ({
+        ...s,
+        cart:
+          qty <= 0
+            ? s.cart.filter((c) => c.listingId !== listingId)
+            : s.cart.map((c) => (c.listingId === listingId ? { ...c, qty } : c)),
+      })),
+    [],
+  );
+
+  const placeOrder = useCallback(
+    (order: Omit<Order, 'id' | 'createdAt' | 'status'>) => {
+      const created: Order = {
+        ...order,
+        id: newId('RN-'),
+        createdAt: new Date().toISOString(),
+        status: order.method === 'cash' ? 'Pay on delivery' : 'Paid · protected',
+      };
+      setState((s) => ({
+        ...s,
+        orders: [created, ...s.orders],
+        cart: s.cart.filter((c) => !order.items.some((i) => i.listingId === c.listingId)),
+      }));
+      return created.id;
+    },
+    [],
+  );
+
+  const setOrderStatus = useCallback(
+    (orderId: string, status: OrderStatus) =>
+      setState((s) => ({ ...s, orders: s.orders.map((o) => (o.id === orderId ? { ...o, status } : o)) })),
+    [],
+  );
+
   return {
     ready,
     ...state,
@@ -227,6 +313,11 @@ function useAppState() {
     markRead,
     updateProfile,
     resetDemo,
+    addViewed,
+    addToCart,
+    setCartQty,
+    placeOrder,
+    setOrderStatus,
   };
 }
 

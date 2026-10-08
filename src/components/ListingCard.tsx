@@ -82,6 +82,11 @@ export function ListingCard({ item, variant = 'featured', width: widthOverride }
             {formatNLe(item.oldPrice)}
           </AppText>
         ) : null}
+        {item.sold && widthOverride ? (
+          <AppText size={11} color={colors.textMuted}>
+            {item.sold} sold
+          </AppText>
+        ) : null}
         {featured ? (
           <View style={styles.locationRow}>
             <Ionicons name="location-sharp" size={12} color={colors.textMuted} />
