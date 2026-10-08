@@ -36,7 +36,7 @@ export function RecentlyViewed() {
                   <Ionicons name={style.icon} size={28} color={colors.navy} />
                 )}
                 <View style={styles.price}>
-                  <AppText weight="bold" size={11} color={colors.white}>
+                  <AppText weight="bold" size={11} color={colors.white} numberOfLines={1} adjustsFontSizeToFit>
                     {formatNLe(item.price)}
                   </AppText>
                 </View>
@@ -79,6 +79,8 @@ const styles = StyleSheet.create({
   price: {
     position: 'absolute',
     left: 4,
+    right: 4,
+    alignItems: 'flex-start',
     bottom: 4,
     paddingHorizontal: 5,
     paddingVertical: 1,
