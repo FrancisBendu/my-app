@@ -51,6 +51,12 @@
         }
       ]
     ],
-    "scheme": "rayno"
+    "scheme": "rayno",
+    "owner": "raynold_bendu",
+    "extra": {
+      "eas": {
+        "projectId": "81c83d72-ed02-45bb-bf27-733e2b39c58b"
+      }
+    }
   }
 }
