@@ -2,7 +2,7 @@
  * Connection to the RAYNO server (Supabase).
  * The two values come from a `.env` file in the project folder (never committed):
  *   EXPO_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
- *   EXPO_PUBLIC_SUPABASE_ANON_KEY=<anon or publishable key>
+ *   EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable key>  (older projects: EXPO_PUBLIC_SUPABASE_ANON_KEY)
  * The anon/publishable key is meant to be in the app; the database rules (RLS)
  * in supabase/schema.sql decide what each user may read or change.
  * Never put the service_role / secret key in the app.
@@ -13,7 +13,8 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+// Each name is written out in full so Expo can insert the values at build time.
+const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(url && key);
 
