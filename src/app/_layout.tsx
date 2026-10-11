@@ -10,6 +10,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AuthProvider } from '@/lib/auth';
 import { StoreProvider } from '@/lib/store';
 import { colors, fonts } from '@/lib/theme';
 
@@ -31,6 +32,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
+      <AuthProvider>
       <StoreProvider>
       <StatusBar style="dark" />
       <Stack
@@ -66,8 +68,10 @@ export default function RootLayout() {
         <Stack.Screen name="orders" options={{ title: 'My Orders' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
         <Stack.Screen name="legal" options={{ title: 'Privacy & Terms' }} />
+        <Stack.Screen name="sign-in" options={{ title: 'Sign in', presentation: 'modal' }} />
       </Stack>
       </StoreProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

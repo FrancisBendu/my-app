@@ -25,6 +25,23 @@ const SECTIONS = [
       'Payments made through RAYNO are protected: the seller is paid after the buyer confirms delivery or after the protection period ends.',
       'Report scams, fake items or abuse with the Report button. We may remove listings and suspend accounts.',
       'RAYNO connects buyers and sellers; each seller is responsible for their items and services.',
+      'All fees are shown before you pay. There are no hidden charges.',
+    ],
+  },
+  {
+    title: 'Refund policy (summary)',
+    points: [
+      'Paid through RAYNO (Orange Money, Afrimoney or card): if the item does not arrive or is not as described, tap “Report a problem” on the order before confirming you received it.',
+      'RAYNO holds the payment while support reviews the case with you and the seller, usually within 3 working days.',
+      'If the report is accepted, you get a full refund to the same wallet or card, or a replacement.',
+      'Cash on delivery and payments made outside RAYNO are not covered by Buyer Protection.',
+    ],
+  },
+  {
+    title: 'Business details',
+    points: [
+      'RAYNO, Freetown, Sierra Leone. Company registration in progress.',
+      'Support contact, registered address and registration number will be listed here before launch.',
     ],
   },
 ];

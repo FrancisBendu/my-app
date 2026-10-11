@@ -3,13 +3,16 @@ import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
 import { LocationSheet } from '@/components/LocationSheet';
 import { Button, DemoNote, Field, SelectField } from '@/components/ui';
+import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { colors, spacing } from '@/lib/theme';
 
 export default function EditProfileScreen() {
   const { profile, updateProfile } = useStore();
+  const auth = useAuth();
   const [name, setName] = useState(profile.name);
-  const [phone, setPhone] = useState(profile.phone);
+  const [phone, setPhone] = useState(profile.phone || auth.phone || '');
   const [location, setLocation] = useState(profile.location);
   const [locationOpen, setLocationOpen] = useState(false);
 
@@ -20,6 +23,15 @@ export default function EditProfileScreen() {
       return;
     }
     updateProfile({ name: name.trim(), phone: phone.trim(), location });
+    if (supabase && auth.session) {
+      // Also save to the RAYNO server; the phone number stays the one verified by SMS.
+      supabase
+        .from('profiles')
+        .upsert({ id: auth.session.user.id, phone: auth.phone, name: name.trim(), location })
+        .then(({ error }) => {
+          if (error) Alert.alert('Saved on this phone only', error.message);
+        });
+    }
     router.back();
   };
 
@@ -35,7 +47,11 @@ export default function EditProfileScreen() {
         hint="Later you will sign in with this number using a one-time SMS code."
       />
       <SelectField label="Where are you based?" value={location} onPress={() => setLocationOpen(true)} />
-      <DemoNote>Your profile is saved on this phone only until RAYNO accounts go live.</DemoNote>
+      <DemoNote>
+        {auth.session
+          ? 'You are signed in, so your name and town are also saved to the RAYNO server.'
+          : 'Your profile is saved on this phone only. Sign in with your phone number to save it to the RAYNO server.'}
+      </DemoNote>
       <Button label="Save" icon="checkmark" onPress={save} />
       <LocationSheet visible={locationOpen} selected={location} onSelect={setLocation} onClose={() => setLocationOpen(false)} />
     </ScrollView>

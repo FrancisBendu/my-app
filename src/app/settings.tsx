@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { LocationSheet } from '@/components/LocationSheet';
+import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { colors, spacing } from '@/lib/theme';
 
@@ -14,6 +15,7 @@ type Row = { label: string; value?: string; onPress: () => void; danger?: boolea
 export default function SettingsScreen() {
   const { profile, updateProfile, resetDemo } = useStore();
   const [locationOpen, setLocationOpen] = useState(false);
+  const auth = useAuth();
   const go = (href: Href) => () => router.push(href);
 
   const groups: Row[][] = [
@@ -60,10 +62,16 @@ export default function SettingsScreen() {
             { text: 'Delete', style: 'destructive', onPress: resetDemo },
           ]),
       },
-      {
-        label: 'Sign out',
-        onPress: () => Alert.alert('Sign out', 'Sign-in with your phone number arrives with the RAYNO server.'),
-      },
+      auth.session
+        ? {
+            label: `Sign out (${auth.phone})`,
+            onPress: () =>
+              Alert.alert('Sign out?', undefined, [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Sign out', style: 'destructive', onPress: () => auth.signOut() },
+              ]),
+          }
+        : { label: 'Sign in with phone number', onPress: go('/sign-in') },
     ],
   ];
 

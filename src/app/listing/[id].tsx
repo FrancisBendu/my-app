@@ -292,7 +292,7 @@ export default function ListingScreen() {
           <View style={styles.section}>
             <View style={styles.rowBetween}>
               <AppText weight="semiBold" size={16}>
-                {itemReviews.length ? 'Product reviews' : 'Store reviews'}
+                {itemReviews.length ? 'Product reviews' : 'Store reviews'} (sample)
               </AppText>
               {seller ? <Rating rating={seller.rating} reviews={seller.reviews} /> : null}
             </View>

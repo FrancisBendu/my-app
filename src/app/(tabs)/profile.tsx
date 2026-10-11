@@ -5,12 +5,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Avatar, Button, DemoNote } from '@/components/ui';
 import type { IconName } from '@/data/mock';
+import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { colors, radius, spacing } from '@/lib/theme';
 
 export default function ProfileScreen() {
   const { profile, myListings, myServices, savedIds, conversations, requests, orders, cart, resetDemo } = useStore();
   const hasProfile = Boolean(profile.name.trim());
+  const auth = useAuth();
 
   const stats = [
     { label: 'Orders', value: orders.length, href: '/orders' as Href },
@@ -60,6 +62,16 @@ export default function ProfileScreen() {
             </AppText>
           </View>
         </View>
+        {auth.session ? (
+          <View style={styles.signedIn}>
+            <Ionicons name="shield-checkmark" size={18} color={colors.green} />
+            <AppText size={13} style={styles.flex}>
+              Signed in as {auth.phone}
+            </AppText>
+          </View>
+        ) : (
+          <Button label="Sign in with phone number" icon="phone-portrait-outline" onPress={() => router.push('/sign-in')} style={styles.editButton} />
+        )}
         <Button
           label={hasProfile ? 'Edit profile' : 'Set up your profile'}
           icon="create-outline"
@@ -125,6 +137,15 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xl * 2,
+  },
+  signedIn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: '#E8F9EF',
   },
   gear: {
     alignSelf: 'flex-end',

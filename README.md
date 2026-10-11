@@ -64,3 +64,16 @@ Expo Go always shows its own icon and splash. Yours appear in development and st
 - No animation libraries; sheets use the core `Modal` with a fade.
 - Mock listing photos are bundled with the app (~75 KB in total), so Home needs no downloads.
 - A listing's `image` can also be a remote URL; keep it around 300px. `expo-image` caches it on disk.
+
+## Real sign-in with SMS codes (Supabase)
+
+1. Create a free account at <https://supabase.com> and a **New project** (region: the closest to Sierra Leone, e.g. Europe West). Save the database password somewhere safe.
+2. **SQL Editor → New query**: paste everything from `supabase/schema.sql` and press **Run**.
+3. **Authentication → Sign In / Providers → Phone**: turn Phone on.
+   - **To test today without paying for SMS:** add **Test phone numbers** with a fixed code, e.g. `23276123456=123456`. Those numbers sign in with that code and no SMS is sent.
+   - **For real SMS:** create a Twilio (or Vonage / MessageBird) account, then paste its Account SID, Auth Token and sender into the Phone settings. Each SMS costs money (roughly US$0.13–0.25 per SMS to Sierra Leone; check the provider's price list).
+4. **Project Settings → API**: copy the **Project URL** and the **anon / publishable** key.
+5. In the project folder create a file named `.env` (copy `.env.example`) and fill in both values. Never use the `service_role` / secret key in the app.
+6. Restart with `npx expo start --clear`. Profile → **Sign in with phone number**.
+
+New users appear under **Authentication → Users**, and their profiles in **Table Editor → profiles**.
