@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Tether",
+    "slug": "tether",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "tether",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tether.app"
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false,
+      "package": "com.tether.app"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-splash-screen"
+    ]
+  }
+}
