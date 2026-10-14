@@ -54,6 +54,8 @@ export default function RootLayout() {
         <Stack.Screen name="listing/[id]" options={{ title: '' }} />
         <Stack.Screen name="member/[id]" options={{ title: '' }} />
         <Stack.Screen name="chat/[id]" options={{ title: '' }} />
+        <Stack.Screen name="connect" options={{ title: 'Private Chat' }} />
+        <Stack.Screen name="private-chat/[id]" options={{ title: '' }} />
         <Stack.Screen name="scan" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
         <Stack.Screen name="sell" options={{ title: 'Sell a Product' }} />
         <Stack.Screen name="offer-service" options={{ title: 'Offer a Service' }} />

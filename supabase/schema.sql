@@ -178,3 +178,94 @@ exception
   when duplicate_object then null;
 end
 $$;
+
+-- RAYNO database, step 3: link two people by invite code.
+-- One person generates a short code and shares it with the other (in person,
+-- by SMS, however they like). The other enters it to connect. A code is
+-- single-use and expires, so it cannot be used to connect to a stranger.
+
+create table if not exists public.chat_invites (
+  code text primary key,
+  created_by uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default (now() + interval '7 days'),
+  used_by uuid references auth.users (id) on delete set null,
+  used_at timestamptz
+);
+
+-- Only the security-definer functions below touch this table; the app never
+-- reads or writes it directly. RLS on with no policies = no direct access.
+alter table public.chat_invites enable row level security;
+
+-- Create a fresh single-use invite code for the signed-in user.
+create or replace function public.create_chat_invite()
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  -- No I, L, O, 0 or 1 — easy to read aloud and type.
+  alphabet constant text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  code text;
+  i int;
+  attempts int := 0;
+begin
+  loop
+    code := '';
+    for i in 1..6 loop
+      code := code || substr(alphabet, 1 + floor(random() * length(alphabet))::int, 1);
+    end loop;
+    begin
+      insert into public.chat_invites (code, created_by) values (code, auth.uid());
+      return code;
+    exception when unique_violation then
+      attempts := attempts + 1;
+      if attempts > 10 then
+        raise exception 'could not generate a code, please try again';
+      end if;
+    end;
+  end loop;
+end;
+$$;
+
+-- Redeem someone else's code: connect the two people and return the thread id.
+create or replace function public.redeem_chat_invite(invite_code text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  inv public.chat_invites;
+  cid uuid;
+begin
+  select * into inv from public.chat_invites
+  where code = upper(trim(invite_code))
+  for update;
+
+  if inv.code is null then
+    raise exception 'that code is not valid';
+  end if;
+  if inv.used_by is not null then
+    raise exception 'that code has already been used';
+  end if;
+  if inv.expires_at < now() then
+    raise exception 'that code has expired';
+  end if;
+  if inv.created_by = auth.uid() then
+    raise exception 'that is your own code — share it with the other person';
+  end if;
+
+  cid := public.create_direct_conversation(inv.created_by);
+
+  update public.chat_invites
+    set used_by = auth.uid(), used_at = now()
+    where code = inv.code;
+
+  return cid;
+end;
+$$;
+
+grant execute on function public.create_chat_invite() to authenticated;
+grant execute on function public.redeem_chat_invite(text) to authenticated;

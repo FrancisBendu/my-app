@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
@@ -21,9 +22,22 @@ export default function MessagesScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AppText weight="semiBold" size={22} style={styles.heading}>
-        Messages
-      </AppText>
+      <View style={styles.headingRow}>
+        <AppText weight="semiBold" size={22}>
+          Messages
+        </AppText>
+        <Pressable
+          onPress={() => router.push('/connect')}
+          style={({ pressed }) => [styles.connectButton, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Start a private chat"
+        >
+          <Ionicons name="people-outline" size={16} color={colors.primary} />
+          <AppText weight="medium" size={13} color={colors.primary}>
+            Private chat
+          </AppText>
+        </Pressable>
+      </View>
       <AppText size={13} color={colors.textMuted} style={styles.subheading}>
         Chat with sellers and service providers. Tap “Chat” on any item or profile to start.
       </AppText>
@@ -95,9 +109,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
-  heading: {
+  headingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
+  },
+  connectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#E6F0FF',
   },
   subheading: {
     paddingHorizontal: spacing.lg,
